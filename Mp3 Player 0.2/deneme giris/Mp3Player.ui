@@ -116,8 +116,8 @@ background-color: rgb(112, 112, 112);</string>
   <widget class="QPushButton" name="begenButon">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>670</y>
+     <x>900</x>
+     <y>260</y>
      <width>70</width>
      <height>70</height>
     </rect>
@@ -279,6 +279,62 @@ background-color: rgb(112, 112, 112);</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="cikisButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(112, 112, 112);
+color: rgb(225, 225, 225);</string>
+   </property>
+   <property name="text">
+    <string>Cikis Yap</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="favorilerButon">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>560</y>
+     <width>121</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>7</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(112, 112, 112);
+color: rgb(225, 225, 225);</string>
+   </property>
+   <property name="text">
+    <string>Favorileri Göster/Gizle</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="begenmeButon">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>370</y>
+     <width>71</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(225, 225, 225);
+background-color: rgb(112, 112, 112);</string>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

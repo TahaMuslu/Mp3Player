@@ -1,6 +1,6 @@
-import random
+# import random
 import sqlite3
-import string
+# import string
 import sys
 import os
 import re
@@ -9,7 +9,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtMultimedia import QMediaContent,QMediaPlayer 
+from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 import smtplib
 from email.mime.text import MIMEText
 
@@ -47,11 +47,11 @@ class GirisEkrani(QDialog):
         self.sifreGoster.stateChanged.connect(self.sifreyiGoster)
         self.geriButon.clicked.connect(self.giristenGeri)
         self.kayitOl.clicked.connect(self.gotoKayitOl)
-        self.ileriButon.clicked.connect(self.giristenIleri)
+        # self.ileriButon.clicked.connect(self.giristenIleri)
         self.sifremiUnuttum.clicked.connect(self.sifreYenileme)
 
-    def giristenIleri(self):
-        widget.setCurrentIndex(widget.currentIndex() + 1)
+    # def giristenIleri(self):
+    # widget.setCurrentIndex(widget.currentIndex() + 1)
 
     def sifreYenileme(self):
         ePosta = self.epostaLine.text()
@@ -60,23 +60,23 @@ class GirisEkrani(QDialog):
         else:
             conn = sqlite3.connect("deneme_data.db")
             cur = conn.cursor()
-           # lower = string.ascii_lowercase     # Random Sifre olusturmak icin
-           # upper = string.ascii_uppercase
-           # num = string.digits
-           # all = lower+upper+num
-           # temp = random.sample(all, 8)
-           # sifre = "".join(temp)
+            # lower = string.ascii_lowercase     # Random Sifre olusturmak icin
+            # upper = string.ascii_uppercase
+            # num = string.digits
+            # all = lower+upper+num
+            # temp = random.sample(all, 8)
+            # sifre = "".join(temp)
             cur.execute('SELECT password FROM login_info WHERE email =\'' + ePosta + "\'")
             temp = cur.fetchone()
             if temp is None:
                 self.label_4.setText("Kayitli E-Posta Bulunamadi")
             else:
                 to = ePosta
-                sender = 'MarmaraMusicPlayer@gmail.com' # Mail gonderimi icin gmail hesabi olusturdum
-                try:                          # email= MarmaraMusicPlayer@gmail.com password= Marmara123
-               #     cur.execute('Update login_info set password = ? where email = ?', (sifre, ePosta)) # Databasedeki
-               #     conn.commit()                                    # şifre bilgisini yeni şifre ile degistiriyor
-               #     conn.close()
+                sender = 'MarmaraMusicPlayer@gmail.com'  # Mail gonderimi icin gmail hesabi olusturdum
+                try:  # email= MarmaraMusicPlayer@gmail.com password= Marmara123
+                    #  cur.execute('Update login_info set password = ? where email = ?', (sifre, ePosta)) # Databasedeki
+                    #     conn.commit()                                    # şifre bilgisini yeni şifre ile degistiriyor
+                    #     conn.close()
                     cur.execute(f'SELECT password FROM login_info WHERE email =\'' + ePosta + "\'")
                     sifre = cur.fetchone()[0]
                     server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -93,6 +93,14 @@ class GirisEkrani(QDialog):
                 except Exception as e:
                     print(e)
 
+    def gotoMusicPlayer(self):
+        try:
+            well = Mp3Player()
+            widget.addWidget(well)
+            widget.show()
+        except Exception as e:
+            print(e)
+
     def gotoKayitOl(self):
         kayit = KayitOlEkrani()
         widget.addWidget(kayit)
@@ -106,10 +114,14 @@ class GirisEkrani(QDialog):
             self.sifreLine.setEchoMode(QtWidgets.QLineEdit.Password)
 
     def giristenGeri(self):
-        widget.setCurrentIndex(widget.currentIndex() - 1)
+        kayit = KayitOlEkrani()
+        widget.addWidget(kayit)
+        widget.setCurrentIndex(widget.currentIndex() + 1)
 
     def girisFonksiyonu(self):
         email = self.epostaLine.text()
+        global Gemail
+        Gemail=email
         sifre = self.sifreLine.text()
         conn = sqlite3.connect("deneme_data.db")
         cur = conn.cursor()
@@ -118,16 +130,16 @@ class GirisEkrani(QDialog):
         cur.execute(query)
 
         result_pass = cur.fetchone()[0]
-
+        
         if result_pass == sifre:
             mp3Player = Mp3Player()
             widget.addWidget(mp3Player)
-            widget.setCurrentIndex(widget.currentIndex()+1)
+            widget.setCurrentIndex(widget.currentIndex() + 1)
             self.label_4.setText("Başarıyla giriş yapıldı")
-            print("Başarıyla giriş yapıldı")
+            # self.gotoMusicPlayer()
         else:
             self.label_4.setText("Geçersiz Şifre")
-
+        conn.close()
 
 class KayitOlEkrani(QDialog):
     def __init__(self):
@@ -156,8 +168,6 @@ class KayitOlEkrani(QDialog):
             self.sifreLine.clear()
             self.sifreLine2.clear()
 
-
-
     def sifreyiGoster(self):
         if self.sifreGoster.isChecked():
             self.sifreLine.setEchoMode(QtWidgets.QLineEdit.Normal)
@@ -167,34 +177,37 @@ class KayitOlEkrani(QDialog):
             self.sifreLine2.setEchoMode(QtWidgets.QLineEdit.Password)
 
     def kayittanGeri(self):
-        widget.setCurrentIndex(widget.currentIndex() - 1)
+        giris = GirisEkrani()
+        widget.addWidget(giris)
+        widget.setCurrentIndex(widget.currentIndex() + 1)
+        widget.show()
 
 
 class Mp3Player(QDialog):
     def __init__(self):
         super(Mp3Player, self).__init__()
+        self.sarki = None
         loadUi("Mp3Player.ui", self)
-        self.setWindowTitle("dgdsg")
-        self.setWindowIcon(QIcon("mp3Player.png"))
-                
+
         self.position = 0
         self.durum = 0
-        self.anlikSarki=""
-        self.index=""
-        self.mute=0
-        
+        self.anlikSarki = ""
+        self.index = None
+        self.mute = 0
+        self.sarkilar = []
+        self.favoriDurumu=0
+
         # self.sarkigeriButon.pressed.connect(self.sarkigeriBasili)
         # self.durdurButon.pressed.connect(self.durdurBasili)
         # self.oynatButon.pressed.connect(self.oynatBasili)
         # self.duraklatButon.pressed.connect(self.duraklatBasili)
         # self.sarkileriButon.pressed.connect(self.sarkileriBasili)
         # self.begenButon.pressed.connect(self.begenBasili)
+
         self.sarkiYolu.clicked.connect(self.sarkiYoluAra)
-        
-        
+        self.cikisButton.clicked.connect(self.showPopUp)
         self.oynatButon.clicked.connect(self.sarkiOynat)
         self.duraklatButon.clicked.connect(self.sarkiDuraklat)
-        
         self.sarkigeriButon.setIcon(self.style().standardIcon(QStyle.SP_MediaSkipBackward))
         self.durdurButon.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
         self.oynatButon.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
@@ -205,15 +218,13 @@ class Mp3Player(QDialog):
         self.sarkileriSar.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekForward))
         self.muteButon.setIcon(self.style().standardIcon(QStyle.SP_MediaVolume))
         self.begenButon.setIcon(QIcon("begen.png"))
-        
-        
-        
+        self.begenmeButon.setIcon(QIcon("begenme.png"))
+
         self.oynatButon.setEnabled(False)
         self.oynatButon.setStyleSheet("background-color : rgb(79,79,79);}")
 
-        
         self.player = QMediaPlayer()
-        self.sarkiKonumu.setRange(0,0)
+        self.sarkiKonumu.setRange(0, 0)
         self.sarkiKonumu.sliderMoved.connect(self.set_position)
         self.player.positionChanged.connect(self.position_changed)
         self.player.durationChanged.connect(self.duration_changed)
@@ -225,79 +236,133 @@ class Mp3Player(QDialog):
         self.sarkiListesi.doubleClicked.connect(self.sarkiOynat)
         self.sesSeviyesi.valueChanged.connect(self.sesDegis)
         self.muteButon.clicked.connect(self.muteDegis)
+        self.sarkiKonumu.sliderPressed.connect(self.sliderPressed)
+        self.sarkiKonumu.sliderReleased.connect(self.sliderReleased)
+        self.begenButon.clicked.connect(self.favoriEkle)
+        self.begenmeButon.clicked.connect(self.favoriSil)
+        self.favorilerButon.clicked.connect(self.favoriGosterGizle)
+
+        # ses = self.player.volume()
+        self.sesSeviyesi.setRange(0, 100)
+        self.sesSeviyesi.setValue(50)
+
+        self.setGeometry(35, 100, 1000, 800)
         
-        ses = self.player.volume()
-        self.sesSeviyesi.setRange(0,100)
-        self.sesSeviyesi.setValue(int(ses)/2)
-        
-        self.setGeometry(35,100,1000,800)
-        
-        
-    # def sarkigeriBasili(self):
-    #     self.sarkigeriButon.setStyleSheet("QPushButton::pressed{border: 1px solid white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-        
-    # def durdurBasili(self):
-    #     self.durdurButon.setStyleSheet("QPushButton::pressed{border: 1px solid white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
- 
-    # def oynatBasili(self):
-    #     self.oynatButon.setStyleSheet("QPushButton::pressed{border: 1px solid white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
- 
-    # def duraklatBasili(self):
-    #     self.duraklatButon.setStyleSheet("QPushButton::pressed{border: 1px solid white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
- 
-    # def sarkileriBasili(self):
-    #     self.sarkileriButon.setStyleSheet("QPushButton::pressed{border: 1px solid white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-   
-    # def begenBasili(self):
-    #      self.begenButon.setStyleSheet("QPushButton::pressed{border: 1px solid white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-        
-         
-        
+        conn = sqlite3.connect("deneme_data.db")
+        cur = conn.cursor()
+        query = "SELECT sarki_yolu FROM sarkilar WHERE email =\'" + Gemail + "\'"
+        cur.execute(query)
+        self.sarkilar=cur.fetchall()
+        for i in range(len(self.sarkilar)):
+            temp=self.sarkilar[i][0]
+            self.sarkilar[i]=temp
+            self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarkilar[i]))
+        conn.close()
+            
+
+    # def sarkigeriBasili(self): self.sarkigeriButon.setStyleSheet("QPushButton::pressed{border: 1px solid
+    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
+
+    # def durdurBasili(self): self.durdurButon.setStyleSheet("QPushButton::pressed{border: 1px solid
+    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
+
+    # def oynatBasili(self): self.oynatButon.setStyleSheet("QPushButton::pressed{border: 1px solid
+    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
+
+    # def duraklatBasili(self): self.duraklatButon.setStyleSheet("QPushButton::pressed{border: 1px solid
+    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
+
+    # def sarkileriBasili(self): self.sarkileriButon.setStyleSheet("QPushButton::pressed{border: 1px solid
+    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
+
+    # def begenBasili(self): self.begenButon.setStyleSheet("QPushButton::pressed{border: 1px solid
+    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
+
+    def showPopUp(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Question)
+        msg.setWindowIcon(QIcon("mp3Player.png"))
+        msg.setWindowTitle("Cikis")
+        msg.setText("Cikmak istediginizden emin misiniz?")
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        a = msg.exec()
+        if a == QMessageBox.Yes:
+            self.sarkiDurdur()
+            welll = GirisEkrani()
+            widget.addWidget(welll)
+            widget.setCurrentIndex(widget.currentIndex() + 1)
+            widget.show()
+        elif a == QMessageBox.No:
+            pass
+
+    # def gotoCikis(self):
+    #     try:
+    #         self.showPopUp()
+    #         # self.sarkiDurdur()
+    #         # welll = GirisEkrani()
+    #         # widget.addWidget(welll)
+    #         # widget.setCurrentIndex(widget.currentIndex()+1)
+    #         # widget.show()
+    #     except Exception as e:
+    #         print(e)
+
+    def sliderPressed(self):
+        self.player.setMuted(1)
+
+    def sliderReleased(self):
+        self.player.setMuted(0)
+
     def sarkiDuraklat(self):
         self.player.pause()
-        
-    
+
     def sarkiIleriSar(self):
         self.player.setPosition(int(self.player.position()) + 2000)
-    
+
     def sarkiGeriSar(self):
         self.player.setPosition(int(self.player.position()) - 2000)
-        
-        
+
     def sarkiIleri(self):
-        self.durum=1
-        try:  
+        self.durum = 1
+        try:
             self.sarkiListesi.setCurrentRow(self.index + 1)
             self.sarkiOynat()
         except:
             pass
-        
+
     def sarkiGeri(self):
-        self.durum=1
+        self.durum = 1
         try:
             self.sarkiListesi.setCurrentRow(self.index - 1)
             self.sarkiOynat()
         except:
             pass
-    
-    
+
     def sarkiYoluAra(self):
         dosyayolu = QFileDialog()
         dosyayolu.setFileMode(QFileDialog.ExistingFiles)
-        isimler = dosyayolu.getOpenFileNames(self,"Dosyaları Aç",os.getenv("Home"))
+        isimler = dosyayolu.getOpenFileNames(self, "Dosyaları Aç", os.getenv("Home"), "Müzik Dosyası (*.mp3) ")
         self.sarki = isimler[0]
-        self.sarkiListesi.addItems(self.sarki)
-        if len(isimler[0])>0:
+        conn = sqlite3.connect("deneme_data.db")
+        cur = conn.cursor()
+        for i in range(len(self.sarki)):
+            veri=["","",0]
+            veri[0]=Gemail
+            veri[1]=self.sarki[i]
+            cur.execute('INSERT INTO sarkilar (email,sarki_yolu,favori) VALUES (?,?,?)', veri)
+            self.sarkilar.append(self.sarki[i])
+            self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarki[i]))
+        if len(isimler[0]) > 0:
             self.oynatButon.setEnabled(True)
             self.oynatButon.setStyleSheet("background-color : rgb(112, 112, 112);}")
-        
-        
+        conn.commit()
+        conn.close()
+
     def sarkiOynat(self):
-        if self.durum==0:
-            if self.anlikSarki!=self.sarkiListesi.currentItem().text():
-                sarkiYolu = self.sarkiListesi.currentItem().text()
-                self.anlikSarki=sarkiYolu
-                self.index=self.sarkiListesi.currentRow().__index__()
+        if self.durum == 0:
+            if self.anlikSarki != self.sarkilar[self.sarkiListesi.currentRow()]:
+                sarkiYolu = self.sarkilar[self.sarkiListesi.currentRow()]
+                self.anlikSarki = sarkiYolu
+                self.index = self.sarkiListesi.currentRow().__index__()
                 url = QUrl.fromLocalFile(sarkiYolu)
                 content = QMediaContent(url)
                 self.player.setMedia(content)
@@ -306,69 +371,120 @@ class Mp3Player(QDialog):
             else:
                 self.player.play()
         else:
-            if self.anlikSarki!=self.sarkiListesi.currentItem().text():
-                sarkiYolu = self.sarkiListesi.currentItem().text()
-                self.anlikSarki=sarkiYolu
-                self.index=self.sarkiListesi.currentRow().__index__()
+            if self.anlikSarki != self.sarkilar[self.sarkiListesi.currentRow()]:
+                sarkiYolu = self.sarkilar[self.sarkiListesi.currentRow()]
+                self.anlikSarki = sarkiYolu
+                self.index = self.sarkiListesi.currentRow().__index__()
                 url = QUrl.fromLocalFile(sarkiYolu)
                 content = QMediaContent(url)
                 self.player.setMedia(content)
                 self.player.play()
-                self.durum = 1
+                # self.durum = 1
             else:
                 self.player.play()
-        liste=re.findall("/.+/(.+)\.mp3", self.anlikSarki)
-        self.sarkiAdi.setText(liste[len(liste)-1])
-            
+        liste = re.findall("/.+/(.+)\.mp3", self.anlikSarki)
+        self.sarkiAdi.setText(liste[len(liste) - 1])
+
     def sarkiDurdur(self):
-        self.durum=0
+        self.durum = 0
         self.player.stop()
         self.sarkiKonumu.setValue(0)
-        
+
     def muteDegis(self):
-        if self.mute==0:
-            self.mute=1
+        if self.mute == 0:
+            self.mute = 1
             self.player.setMuted(1)
             self.muteButon.setIcon(self.style().standardIcon(QStyle.SP_MediaVolumeMuted))
         else:
-            self.mute=0
+            self.mute = 0
             self.player.setMuted(0)
             self.muteButon.setIcon(self.style().standardIcon(QStyle.SP_MediaVolume))
-            
 
-    def set_position(self,position):
+    def set_position(self, position):
         self.player.setPosition(position)
 
-    def position_changed(self,position):
+    def position_changed(self, position):
         self.sarkiKonumu.setValue(position)
         duration = self.player.duration()
-        value=self.sarkiKonumu.value()
-        if value==duration:
+        value = self.sarkiKonumu.value()
+        if value == duration:
             self.sarkiOynat()
 
-    def duration_changed(self,duration):
-        self.sarkiKonumu.setRange(0,duration)
-        
+    def duration_changed(self, duration):
+        self.sarkiKonumu.setRange(0, duration)
+
     def sesDegis(self):
-        ses=self.sesSeviyesi.value()
+        ses = self.sesSeviyesi.value()
         self.player.setVolume(ses)
-        self.sesSeviye.setText("%"+str(ses))
+        self.sesSeviye.setText("%" + str(ses))
 
+    def favoriEkle(self):
+        conn = sqlite3.connect("deneme_data.db")
+        cur = conn.cursor()
+        yol = self.sarkilar[self.sarkiListesi.currentRow()]
+        cur.execute('UPDATE sarkilar SET favori=\'1\' WHERE sarki_yolu=\'' + yol + "\'")
+        conn.commit()
+        conn.close()
+    
+    def favoriSil(self):
+        conn = sqlite3.connect("deneme_data.db")
+        cur = conn.cursor()
+        yol = self.sarkilar[self.sarkiListesi.currentRow()]
+        cur.execute('UPDATE sarkilar SET favori=\'0\' WHERE sarki_yolu=\'' + yol + "\'")
+        conn.commit()
+        conn.close()
+        
+        self.favoriDurumu=0
+        self.favoriGosterGizle()
 
-
-
+    def favoriGosterGizle(self):
+        if self.favoriDurumu==0:
+            self.sarkiListesi.clear()
+            self.sarkilar.clear()
+            conn = sqlite3.connect("deneme_data.db")
+            cur = conn.cursor()
+            query = 'SELECT favori,sarki_yolu FROM sarkilar WHERE email =\'' + Gemail + '\''
+            cur.execute(query)
+            temp=cur.fetchall()
+            favorite=[]
+            songs=[]
+            for i in range(len(temp)):
+                favorite.append(temp[i][0])
+                songs.append(temp[i][1])
+            conn.close()
+            for i in range(len(songs)):
+                if favorite[i]==1:
+                    self.sarkilar.append(songs[i])
+                    self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", songs[i]))
+            
+            self.favoriDurumu=1
+        else:
+            self.sarkiListesi.clear()
+            self.sarkilar.clear()
+            conn = sqlite3.connect("deneme_data.db")
+            cur = conn.cursor()
+            query = "SELECT sarki_yolu FROM sarkilar WHERE email =\'" + Gemail + "\'"
+            cur.execute(query)
+            self.sarkilar=cur.fetchall()
+            for i in range(len(self.sarkilar)):
+                temp=self.sarkilar[i][0]
+                self.sarkilar[i]=temp
+                self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarkilar[i]))
+                conn.close()
+            self.favoriDurumu=0
+        
 # main
 app = QApplication(sys.argv)
-welcome = Mp3Player()
+
+welcome = GirisEkrani()
 widget = QStackedWidget()
 widget.addWidget(welcome)
 widget.setFixedWidth(1100)
 widget.setFixedHeight(860)
+widget.setWindowTitle("Mp3 Player")
+widget.setWindowIcon(QIcon("mp3Player.png"))
 widget.show()
-
 try:
     sys.exit(app.exec_())
 except:
     print("Exiting")
-    Mp3Player().player.disconnect()
-    
