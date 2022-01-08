@@ -4,6 +4,8 @@ import sqlite3
 import sys
 import os
 import re
+from time import sleep
+
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
@@ -47,11 +49,33 @@ class GirisEkrani(QDialog):
         self.sifreGoster.stateChanged.connect(self.sifreyiGoster)
         self.geriButon.clicked.connect(self.giristenGeri)
         self.kayitOl.clicked.connect(self.gotoKayitOl)
-        # self.ileriButon.clicked.connect(self.giristenIleri)
+        self.kayitOl.pressed.connect(self.kayitOlPressed)
+        self.kayitOl.released.connect(self.kayitOlReleased)
+        self.girisButon.pressed.connect(self.girisPressed)
+        self.girisButon.released.connect(self.girisReleased)
+        self.sifremiUnuttum.pressed.connect(self.sifremiUnuttumPressed)
+        self.sifremiUnuttum.released.connect(self.sifremiUnuttumReleased)
         self.sifremiUnuttum.clicked.connect(self.sifreYenileme)
 
     # def giristenIleri(self):
     # widget.setCurrentIndex(widget.currentIndex() + 1)
+    def girisPressed(self):
+        self.girisButon.setStyleSheet("background-color: rgb(112, 174, 200);border-radius:20px;")
+
+    def girisReleased(self):
+        self.girisButon.setStyleSheet("background-color: rgb(143, 220, 255);border-radius:20px;")
+
+    def sifremiUnuttumPressed(self):
+        self.sifremiUnuttum.setStyleSheet("background-color: rgb(112, 174, 200);border-radius:20px;")
+
+    def sifremiUnuttumReleased(self):
+        self.sifremiUnuttum.setStyleSheet("background-color: rgb(143, 220, 255);border-radius:20px;")
+
+    def kayitOlPressed(self):
+        self.kayitOl.setStyleSheet("background-color: rgb(112, 174, 200);border-radius:20px;")
+
+    def kayitOlReleased(self):
+        self.kayitOl.setStyleSheet("background-color: rgb(143, 220, 255);border-radius:20px;")
 
     def sifreYenileme(self):
         ePosta = self.epostaLine.text()
@@ -121,7 +145,7 @@ class GirisEkrani(QDialog):
     def girisFonksiyonu(self):
         email = self.epostaLine.text()
         global Gemail
-        Gemail=email
+        Gemail = email
         sifre = self.sifreLine.text()
         conn = sqlite3.connect("deneme_data.db")
         cur = conn.cursor()
@@ -130,7 +154,7 @@ class GirisEkrani(QDialog):
         cur.execute(query)
 
         result_pass = cur.fetchone()[0]
-        
+
         if result_pass == sifre:
             mp3Player = Mp3Player()
             widget.addWidget(mp3Player)
@@ -141,6 +165,7 @@ class GirisEkrani(QDialog):
             self.label_4.setText("Geçersiz Şifre")
         conn.close()
 
+
 class KayitOlEkrani(QDialog):
     def __init__(self):
         super(KayitOlEkrani, self).__init__()
@@ -148,6 +173,14 @@ class KayitOlEkrani(QDialog):
         self.kayitOl.clicked.connect(self.kayitOlFonksiyon)
         self.geriButon.clicked.connect(self.kayittanGeri)
         self.sifreGoster.stateChanged.connect(self.sifreyiGoster)
+        self.kayitOl.pressed.connect(self.kayitOlPressed)
+        self.kayitOl.released.connect(self.kayitOlReleased)
+
+    def kayitOlPressed(self):
+        self.kayitOl.setStyleSheet("background-color: rgb(112, 174, 200);border-radius:20px;")
+
+    def kayitOlReleased(self):
+        self.kayitOl.setStyleSheet("background-color: rgb(143, 220, 255);border-radius:20px;")
 
     def kayitOlFonksiyon(self):
         email = self.epostaLine.text()
@@ -188,14 +221,16 @@ class Mp3Player(QDialog):
         super(Mp3Player, self).__init__()
         self.sarki = None
         loadUi("Mp3Player.ui", self)
-
+        self.timer = QTimer()
+        # timer.deleteLater()
+        # self.timer.singleShot(10, self.InfoLabel)
         self.position = 0
         self.durum = 0
         self.anlikSarki = ""
         self.index = None
         self.mute = 0
         self.sarkilar = []
-        self.favoriDurumu=0
+        self.favoriDurumu = 0
 
         # self.sarkigeriButon.pressed.connect(self.sarkigeriBasili)
         # self.durdurButon.pressed.connect(self.durdurBasili)
@@ -217,8 +252,8 @@ class Mp3Player(QDialog):
         self.sarkigeriSar.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekBackward))
         self.sarkileriSar.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekForward))
         self.muteButon.setIcon(self.style().standardIcon(QStyle.SP_MediaVolume))
-        self.begenButon.setIcon(QIcon("begen.png"))
-        self.begenmeButon.setIcon(QIcon("begenme.png"))
+        #  self.begenButon.setIcon(QIcon("begen.png"))
+        #  self.begenmeButon.setIcon(QIcon("begenme.png"))
 
         self.oynatButon.setEnabled(False)
         self.oynatButon.setStyleSheet("background-color : rgb(79,79,79);}")
@@ -239,7 +274,12 @@ class Mp3Player(QDialog):
         self.sarkiKonumu.sliderPressed.connect(self.sliderPressed)
         self.sarkiKonumu.sliderReleased.connect(self.sliderReleased)
         self.begenButon.clicked.connect(self.favoriEkle)
+        self.begenButon.pressed.connect(self.begenButonPressed)
+        self.begenButon.released.connect(self.begenButonReleased)
+        self.begenmeButon.pressed.connect(self.begenmeButonPressed)
+        self.begenmeButon.released.connect(self.begenmeButonReleased)
         self.begenmeButon.clicked.connect(self.favoriSil)
+
         self.favorilerButon.clicked.connect(self.favoriGosterGizle)
 
         # ses = self.player.volume()
@@ -247,18 +287,29 @@ class Mp3Player(QDialog):
         self.sesSeviyesi.setValue(50)
 
         self.setGeometry(35, 100, 1000, 800)
-        
+
         conn = sqlite3.connect("deneme_data.db")
         cur = conn.cursor()
         query = "SELECT sarki_yolu FROM sarkilar WHERE email =\'" + Gemail + "\'"
         cur.execute(query)
-        self.sarkilar=cur.fetchall()
+        self.sarkilar = cur.fetchall()
         for i in range(len(self.sarkilar)):
-            temp=self.sarkilar[i][0]
-            self.sarkilar[i]=temp
+            temp = self.sarkilar[i][0]
+            self.sarkilar[i] = temp
             self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarkilar[i]))
         conn.close()
-            
+
+    def begenmeButonPressed(self):
+        self.begenmeButon.setStyleSheet("background-color: rgb(70, 70, 70);border-radius:20px;")
+
+    def begenmeButonReleased(self):
+        self.begenmeButon.setStyleSheet("background-color: rgb(112, 112, 112);border-radius:20px;")
+
+    def begenButonPressed(self):
+        self.begenButon.setStyleSheet("background-color: rgb(70, 70, 70);border-radius:20px;")
+
+    def begenButonReleased(self):
+        self.begenButon.setStyleSheet("background-color: rgb(112, 112, 112);border-radius:20px;")
 
     # def sarkigeriBasili(self): self.sarkigeriButon.setStyleSheet("QPushButton::pressed{border: 1px solid
     # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
@@ -345,9 +396,9 @@ class Mp3Player(QDialog):
         conn = sqlite3.connect("deneme_data.db")
         cur = conn.cursor()
         for i in range(len(self.sarki)):
-            veri=["","",0]
-            veri[0]=Gemail
-            veri[1]=self.sarki[i]
+            veri = ["", "", 0]
+            veri[0] = Gemail
+            veri[1] = self.sarki[i]
             cur.execute('INSERT INTO sarkilar (email,sarki_yolu,favori) VALUES (?,?,?)', veri)
             self.sarkilar.append(self.sarki[i])
             self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarki[i]))
@@ -423,56 +474,62 @@ class Mp3Player(QDialog):
         cur = conn.cursor()
         yol = self.sarkilar[self.sarkiListesi.currentRow()]
         cur.execute('UPDATE sarkilar SET favori=\'1\' WHERE sarki_yolu=\'' + yol + "\'")
+        a = re.findall(".+/(.+)\.mp3", yol)
+        self.InfoLabel.setText(f'{a[0]} favorilere eklendi')
         conn.commit()
         conn.close()
-    
+
     def favoriSil(self):
         conn = sqlite3.connect("deneme_data.db")
         cur = conn.cursor()
         yol = self.sarkilar[self.sarkiListesi.currentRow()]
         cur.execute('UPDATE sarkilar SET favori=\'0\' WHERE sarki_yolu=\'' + yol + "\'")
+        a = re.findall(".+/(.+)\.mp3", yol)
+        self.InfoLabel.setText(f'{a[0]} favorilerden cikartildi')
         conn.commit()
         conn.close()
-        
-        self.favoriDurumu=0
+        self.favoriDurumu = 0
         self.favoriGosterGizle()
 
     def favoriGosterGizle(self):
-        if self.favoriDurumu==0:
+        if self.favoriDurumu == 0:
             self.sarkiListesi.clear()
             self.sarkilar.clear()
+            self.favorilerButon.setText("Favorileri Gizle")
             conn = sqlite3.connect("deneme_data.db")
             cur = conn.cursor()
             query = 'SELECT favori,sarki_yolu FROM sarkilar WHERE email =\'' + Gemail + '\''
             cur.execute(query)
-            temp=cur.fetchall()
-            favorite=[]
-            songs=[]
+            temp = cur.fetchall()
+            favorite = []
+            songs = []
             for i in range(len(temp)):
                 favorite.append(temp[i][0])
                 songs.append(temp[i][1])
             conn.close()
             for i in range(len(songs)):
-                if favorite[i]==1:
+                if favorite[i] == 1:
                     self.sarkilar.append(songs[i])
                     self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", songs[i]))
-            
-            self.favoriDurumu=1
+
+            self.favoriDurumu = 1
         else:
             self.sarkiListesi.clear()
             self.sarkilar.clear()
+            self.favorilerButon.setText("Favorileri Goster")
             conn = sqlite3.connect("deneme_data.db")
             cur = conn.cursor()
             query = "SELECT sarki_yolu FROM sarkilar WHERE email =\'" + Gemail + "\'"
             cur.execute(query)
-            self.sarkilar=cur.fetchall()
+            self.sarkilar = cur.fetchall()
             for i in range(len(self.sarkilar)):
-                temp=self.sarkilar[i][0]
-                self.sarkilar[i]=temp
+                temp = self.sarkilar[i][0]
+                self.sarkilar[i] = temp
                 self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarkilar[i]))
                 conn.close()
-            self.favoriDurumu=0
-        
+            self.favoriDurumu = 0
+
+
 # main
 app = QApplication(sys.argv)
 

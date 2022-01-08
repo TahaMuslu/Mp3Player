@@ -141,7 +141,7 @@ border-radius:5px;</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(143, 220, 255);
-border-radius:15px;</string>
+border-radius:20px;</string>
     </property>
     <property name="text">
      <string>Giriş</string>
@@ -243,7 +243,7 @@ border-radius:15px;</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(143, 220, 255);
-border-radius:15px;</string>
+border-radius:20px;</string>
     </property>
     <property name="text">
      <string>Kayıt Ol</string>
@@ -325,7 +325,7 @@ border-radius:15px;</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(143, 220, 255);
-border-radius:15px;</string>
+border-radius:20px;</string>
     </property>
     <property name="text">
      <string>Şifremi Unuttum</string>

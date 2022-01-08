@@ -88,7 +88,7 @@ background-color:qlineargradient(spread:pad, x1:0.058, y1:0.0685288, x2:0.997304
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(143, 220, 255);
-border-radius:15px;</string>
+border-radius:20px;</string>
     </property>
     <property name="text">
      <string>Kayıt Ol</string>
