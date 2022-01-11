@@ -231,7 +231,9 @@ class Mp3Player(QDialog):
         self.mute = 0
         self.sarkilar = []
         self.favoriDurumu = 0
-
+        
+     
+        
         # self.sarkigeriButon.pressed.connect(self.sarkigeriBasili)
         # self.durdurButon.pressed.connect(self.durdurBasili)
         # self.oynatButon.pressed.connect(self.oynatBasili)
@@ -279,9 +281,8 @@ class Mp3Player(QDialog):
         self.begenmeButon.pressed.connect(self.begenmeButonPressed)
         self.begenmeButon.released.connect(self.begenmeButonReleased)
         self.begenmeButon.clicked.connect(self.favoriSil)
-
         self.favorilerButon.clicked.connect(self.favoriGosterGizle)
-
+        
         # ses = self.player.volume()
         self.sesSeviyesi.setRange(0, 100)
         self.sesSeviyesi.setValue(50)
@@ -298,6 +299,7 @@ class Mp3Player(QDialog):
             self.sarkilar[i] = temp
             self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarkilar[i]))
         conn.close()
+        
 
     def begenmeButonPressed(self):
         self.begenmeButon.setStyleSheet("background-color: rgb(70, 70, 70);border-radius:20px;")
@@ -311,23 +313,6 @@ class Mp3Player(QDialog):
     def begenButonReleased(self):
         self.begenButon.setStyleSheet("background-color: rgb(112, 112, 112);border-radius:20px;")
 
-    # def sarkigeriBasili(self): self.sarkigeriButon.setStyleSheet("QPushButton::pressed{border: 1px solid
-    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-
-    # def durdurBasili(self): self.durdurButon.setStyleSheet("QPushButton::pressed{border: 1px solid
-    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-
-    # def oynatBasili(self): self.oynatButon.setStyleSheet("QPushButton::pressed{border: 1px solid
-    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-
-    # def duraklatBasili(self): self.duraklatButon.setStyleSheet("QPushButton::pressed{border: 1px solid
-    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-
-    # def sarkileriBasili(self): self.sarkileriButon.setStyleSheet("QPushButton::pressed{border: 1px solid
-    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
-
-    # def begenBasili(self): self.begenButon.setStyleSheet("QPushButton::pressed{border: 1px solid
-    # white;background-color : rgb(79,79,79);color: rgb(225, 225, 225);}")
 
     def showPopUp(self):
         msg = QMessageBox()
