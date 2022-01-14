@@ -1,10 +1,7 @@
-# import random
 import sqlite3
-# import string
 import sys
 import os
 import re
-from time import sleep
 
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
@@ -14,31 +11,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 import smtplib
 from email.mime.text import MIMEText
-
-"""class HosgeldinEkrani(QDialog):
-    def __init__(self):
-        super(HosgeldinEkrani, self).__init__()
-        loadUi("Hosgeldin.ui", self)
-        self.giris.clicked.connect(self.gotogiris)
-        self.hesapOlustur.clicked.connect(self.gotohesapOlustur)
-        self.ileriButon.clicked.connect(self.hosgeldindenIleri)
-
-    def gotohesapOlustur(self):
-        olustur = HesapOlusturEkrani()
-        widget.addWidget(olustur)
-        widget.setCurrentIndex(widget.currentIndex()+1)
-
-
-
-    def hosgeldindenIleri(self):
-        widget.setCurrentIndex(widget.currentIndex()+1)
-
-
-    def gotogiris(self):
-        giris = GirisEkrani()
-        widget.addWidget(giris)
-        widget.setCurrentIndex(widget.currentIndex()+1)
-        self.ileriButon.setEnabled(True)"""
 
 
 class GirisEkrani(QDialog):
@@ -57,8 +29,6 @@ class GirisEkrani(QDialog):
         self.sifremiUnuttum.released.connect(self.sifremiUnuttumReleased)
         self.sifremiUnuttum.clicked.connect(self.sifreYenileme)
 
-    # def giristenIleri(self):
-    # widget.setCurrentIndex(widget.currentIndex() + 1)
     def girisPressed(self):
         self.girisButon.setStyleSheet("background-color: rgb(112, 174, 200);border-radius:20px;")
 
@@ -82,14 +52,8 @@ class GirisEkrani(QDialog):
         if not str(ePosta).endswith(".com"):
             self.label_4.setText("E-Postanizi Giriniz ")
         else:
-            conn = sqlite3.connect("deneme_data.db")
+            conn = sqlite3.connect("MusicPlayer.db")
             cur = conn.cursor()
-            # lower = string.ascii_lowercase     # Random Sifre olusturmak icin
-            # upper = string.ascii_uppercase
-            # num = string.digits
-            # all = lower+upper+num
-            # temp = random.sample(all, 8)
-            # sifre = "".join(temp)
             cur.execute('SELECT password FROM login_info WHERE email =\'' + ePosta + "\'")
             temp = cur.fetchone()
             if temp is None:
@@ -97,10 +61,7 @@ class GirisEkrani(QDialog):
             else:
                 to = ePosta
                 sender = 'MarmaraMusicPlayer@gmail.com'  # Mail gonderimi icin gmail hesabi olusturdum
-                try:  # email= MarmaraMusicPlayer@gmail.com password= Marmara123
-                    #  cur.execute('Update login_info set password = ? where email = ?', (sifre, ePosta)) # Databasedeki
-                    #     conn.commit()                                    # şifre bilgisini yeni şifre ile degistiriyor
-                    #     conn.close()
+                try:
                     cur.execute(f'SELECT password FROM login_info WHERE email =\'' + ePosta + "\'")
                     sifre = cur.fetchone()[0]
                     server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -147,9 +108,8 @@ class GirisEkrani(QDialog):
         global Gemail
         Gemail = email
         sifre = self.sifreLine.text()
-        conn = sqlite3.connect("deneme_data.db")
+        conn = sqlite3.connect("MusicPlayer.db")
         cur = conn.cursor()
-        #  cur.execute('INSERT INTO login_info (email, password) VALUES (?,?)', user_info)
         query = 'SELECT password FROM login_info WHERE email =\'' + email + "\'"
         cur.execute(query)
 
@@ -160,7 +120,6 @@ class GirisEkrani(QDialog):
             widget.addWidget(mp3Player)
             widget.setCurrentIndex(widget.currentIndex() + 1)
             self.label_4.setText("Başarıyla giriş yapıldı")
-            # self.gotoMusicPlayer()
         else:
             self.label_4.setText("Geçersiz Şifre")
         conn.close()
@@ -190,7 +149,7 @@ class KayitOlEkrani(QDialog):
             self.hata.setText("Şifreler Eşleşmiyor!")
         else:
 
-            conn = sqlite3.connect("deneme_data.db")
+            conn = sqlite3.connect("MusicPlayer.db")
             cur = conn.cursor()
             kullanici = [email, sifre]
             cur.execute('INSERT INTO login_info (email,password) VALUES (?,?)', kullanici)
@@ -221,9 +180,6 @@ class Mp3Player(QDialog):
         super(Mp3Player, self).__init__()
         self.sarki = None
         loadUi("Mp3Player.ui", self)
-        self.timer = QTimer()
-        # timer.deleteLater()
-        # self.timer.singleShot(10, self.InfoLabel)
         self.position = 0
         self.durum = 0
         self.anlikSarki = ""
@@ -231,15 +187,6 @@ class Mp3Player(QDialog):
         self.mute = 0
         self.sarkilar = []
         self.favoriDurumu = 0
-        
-     
-        
-        # self.sarkigeriButon.pressed.connect(self.sarkigeriBasili)
-        # self.durdurButon.pressed.connect(self.durdurBasili)
-        # self.oynatButon.pressed.connect(self.oynatBasili)
-        # self.duraklatButon.pressed.connect(self.duraklatBasili)
-        # self.sarkileriButon.pressed.connect(self.sarkileriBasili)
-        # self.begenButon.pressed.connect(self.begenBasili)
 
         self.sarkiYolu.clicked.connect(self.sarkiYoluAra)
         self.cikisButton.clicked.connect(self.showPopUp)
@@ -254,11 +201,6 @@ class Mp3Player(QDialog):
         self.sarkigeriSar.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekBackward))
         self.sarkileriSar.setIcon(self.style().standardIcon(QStyle.SP_MediaSeekForward))
         self.muteButon.setIcon(self.style().standardIcon(QStyle.SP_MediaVolume))
-        #  self.begenButon.setIcon(QIcon("begen.png"))
-        #  self.begenmeButon.setIcon(QIcon("begenme.png"))
-
-        self.oynatButon.setEnabled(False)
-        self.oynatButon.setStyleSheet("background-color : rgb(79,79,79);}")
 
         self.player = QMediaPlayer()
         self.sarkiKonumu.setRange(0, 0)
@@ -281,15 +223,16 @@ class Mp3Player(QDialog):
         self.begenmeButon.pressed.connect(self.begenmeButonPressed)
         self.begenmeButon.released.connect(self.begenmeButonReleased)
         self.begenmeButon.clicked.connect(self.favoriSil)
+
         self.favorilerButon.clicked.connect(self.favoriGosterGizle)
-        
-        # ses = self.player.volume()
+
+        #self.player.volume()
         self.sesSeviyesi.setRange(0, 100)
         self.sesSeviyesi.setValue(50)
 
         self.setGeometry(35, 100, 1000, 800)
 
-        conn = sqlite3.connect("deneme_data.db")
+        conn = sqlite3.connect("MusicPlayer.db")
         cur = conn.cursor()
         query = "SELECT sarki_yolu FROM sarkilar WHERE email =\'" + Gemail + "\'"
         cur.execute(query)
@@ -298,8 +241,10 @@ class Mp3Player(QDialog):
             temp = self.sarkilar[i][0]
             self.sarkilar[i] = temp
             self.sarkiListesi.addItems(re.findall("/.+/(.+)\.mp3", self.sarkilar[i]))
+        if len(self.sarkilar) == 0:
+            self.oynatButon.setEnabled(False)
+            self.oynatButon.setStyleSheet("background-color : rgb(79,79,79);}")
         conn.close()
-        
 
     def begenmeButonPressed(self):
         self.begenmeButon.setStyleSheet("background-color: rgb(70, 70, 70);border-radius:20px;")
@@ -312,7 +257,6 @@ class Mp3Player(QDialog):
 
     def begenButonReleased(self):
         self.begenButon.setStyleSheet("background-color: rgb(112, 112, 112);border-radius:20px;")
-
 
     def showPopUp(self):
         msg = QMessageBox()
@@ -330,17 +274,6 @@ class Mp3Player(QDialog):
             widget.show()
         elif a == QMessageBox.No:
             pass
-
-    # def gotoCikis(self):
-    #     try:
-    #         self.showPopUp()
-    #         # self.sarkiDurdur()
-    #         # welll = GirisEkrani()
-    #         # widget.addWidget(welll)
-    #         # widget.setCurrentIndex(widget.currentIndex()+1)
-    #         # widget.show()
-    #     except Exception as e:
-    #         print(e)
 
     def sliderPressed(self):
         self.player.setMuted(1)
@@ -378,7 +311,7 @@ class Mp3Player(QDialog):
         dosyayolu.setFileMode(QFileDialog.ExistingFiles)
         isimler = dosyayolu.getOpenFileNames(self, "Dosyaları Aç", os.getenv("Home"), "Müzik Dosyası (*.mp3) ")
         self.sarki = isimler[0]
-        conn = sqlite3.connect("deneme_data.db")
+        conn = sqlite3.connect("MusicPlayer.db")
         cur = conn.cursor()
         for i in range(len(self.sarki)):
             veri = ["", "", 0]
@@ -415,7 +348,6 @@ class Mp3Player(QDialog):
                 content = QMediaContent(url)
                 self.player.setMedia(content)
                 self.player.play()
-                # self.durum = 1
             else:
                 self.player.play()
         liste = re.findall("/.+/(.+)\.mp3", self.anlikSarki)
@@ -455,7 +387,7 @@ class Mp3Player(QDialog):
         self.sesSeviye.setText("%" + str(ses))
 
     def favoriEkle(self):
-        conn = sqlite3.connect("deneme_data.db")
+        conn = sqlite3.connect("MusicPlayer.db")
         cur = conn.cursor()
         yol = self.sarkilar[self.sarkiListesi.currentRow()]
         cur.execute('UPDATE sarkilar SET favori=\'1\' WHERE sarki_yolu=\'' + yol + "\'")
@@ -465,7 +397,7 @@ class Mp3Player(QDialog):
         conn.close()
 
     def favoriSil(self):
-        conn = sqlite3.connect("deneme_data.db")
+        conn = sqlite3.connect("MusicPlayer.db")
         cur = conn.cursor()
         yol = self.sarkilar[self.sarkiListesi.currentRow()]
         cur.execute('UPDATE sarkilar SET favori=\'0\' WHERE sarki_yolu=\'' + yol + "\'")
@@ -481,7 +413,7 @@ class Mp3Player(QDialog):
             self.sarkiListesi.clear()
             self.sarkilar.clear()
             self.favorilerButon.setText("Favorileri Gizle")
-            conn = sqlite3.connect("deneme_data.db")
+            conn = sqlite3.connect("MusicPlayer.db")
             cur = conn.cursor()
             query = 'SELECT favori,sarki_yolu FROM sarkilar WHERE email =\'' + Gemail + '\''
             cur.execute(query)
@@ -502,7 +434,7 @@ class Mp3Player(QDialog):
             self.sarkiListesi.clear()
             self.sarkilar.clear()
             self.favorilerButon.setText("Favorileri Goster")
-            conn = sqlite3.connect("deneme_data.db")
+            conn = sqlite3.connect("MusicPlayer.db")
             cur = conn.cursor()
             query = "SELECT sarki_yolu FROM sarkilar WHERE email =\'" + Gemail + "\'"
             cur.execute(query)
@@ -529,4 +461,4 @@ widget.show()
 try:
     sys.exit(app.exec_())
 except:
-    print("Exiting")
+    print("Program Sonlandirildi.")
