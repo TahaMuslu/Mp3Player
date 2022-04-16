@@ -112,15 +112,15 @@ class GirisEkrani(QDialog):
         cur = conn.cursor()
         query = 'SELECT password FROM login_info WHERE email =\'' + email + "\'"
         cur.execute(query)
-
-        result_pass = cur.fetchone()[0]
-
-        if result_pass == sifre:
+        result_pass = cur.fetchone()
+        if result_pass is None:
+            self.label_4.setText("Kayitli E-Posta Bulunamadi")
+        elif result_pass[0] == sifre:
             mp3Player = Mp3Player()
             widget.addWidget(mp3Player)
             widget.setCurrentIndex(widget.currentIndex() + 1)
             self.label_4.setText("Başarıyla giriş yapıldı")
-        else:
+        elif result_pass is not None and result_pass != sifre:
             self.label_4.setText("Geçersiz Şifre")
         conn.close()
 
